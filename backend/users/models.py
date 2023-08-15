@@ -4,6 +4,9 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
 class User(AbstractUser):
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
+
     username = models.CharField(
         blank=False,
         max_length=150,
@@ -32,3 +35,9 @@ class User(AbstractUser):
         max_length=150,
         verbose_name='Пароль',
     )
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        ordering = ['username']
