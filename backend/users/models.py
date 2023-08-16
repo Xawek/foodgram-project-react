@@ -41,3 +41,28 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['username']
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following'
+    )
+
+    class Meta:
+        ordering = ['id']
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    'user',
+                    'author'
+                ),
+                name='unique_follow'
+            )
+        ]
