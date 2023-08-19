@@ -1,5 +1,10 @@
 from django.db import models
-from django.core.validators import RegexValidator
+from django.core.validators import (
+    RegexValidator,
+    MinValueValidator,
+    MaxValueValidator
+)
+from users.models import User
 
 
 class Tag(models.Model):
@@ -42,3 +47,59 @@ class Ingredient(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+class Recipe(models.Model):
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='IngredientInRecipe',
+        related_name='recipes',
+    )
+    tags = models.ManyToManyField(
+        Tag,
+        through='TagForRecipe',
+        related_name='recipes',
+    )
+    name = models.CharField(
+        blank=False,
+        max_length=200,
+    )
+    text = models.TextField()
+    cooking_time = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(360),
+        ]
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+
+
+class IngredientInRecipe(models.Model):
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+    )
+    amount = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1)],
+    )
+
+    class Meta:
+        ordering = ['id']
+
+
+class TagForRecipe(models.Model):
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+    )
