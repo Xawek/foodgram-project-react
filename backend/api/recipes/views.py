@@ -6,7 +6,7 @@ from .serializers import (
     CreateRecipeSerializer,
     FavoriteSerializer,
 )
-from recipes.models import Tag, Ingredient, Recipe, Favorite
+from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart
 from api.permissions import IsAdminOrReader, IsAdminOrAuthor
 from .fiters import IngredientFilters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -61,6 +61,29 @@ class RecipeViewSet(ModelViewSet):
         if request.method == 'DELETE':
             recipe = get_object_or_404(Recipe, id=pk)
             favorite_for_removre = Favorite.objects.filter(
+                user=request.user,
+                recipe=recipe
+                )
+            if favorite_for_removre.exists():
+                favorite_for_removre.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        permission_classes=(IsAuthenticated,),
+        methods=['POST', 'DELETE'],
+        url_path='shopping_cart',
+        detail=True,
+    )
+    def shopping_cart(self, request, pk):
+        if request.method == 'POST':
+            recipe = get_object_or_404(Recipe, id=pk)
+            ShoppingCart.objects.create(user=request.user, recipe=recipe,)
+            serializer = FavoriteSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'DELETE':
+            recipe = get_object_or_404(Recipe, id=pk)
+            favorite_for_removre = ShoppingCart.objects.filter(
                 user=request.user,
                 recipe=recipe
                 )
