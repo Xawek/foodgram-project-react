@@ -12,6 +12,7 @@ from recipes.models import (
     Favorite,
 )
 from api.users.serializers import FoodgramUserSerializer
+from drf_extra_fields.fields import Base64ImageField
 
 
 class TagSerializer(ModelSerializer):
@@ -68,6 +69,7 @@ class IngredientForRecipeSerializer(ModelSerializer):
 
 
 class RecipeSerializer(ModelSerializer):
+    image = Base64ImageField()
     tags = TagSerializer(
         many=True
         )
@@ -87,6 +89,7 @@ class RecipeSerializer(ModelSerializer):
         fields = (
             'id',
             'tags',
+            'image',
             'author',
             'ingredients',
             'name',
@@ -108,7 +111,7 @@ class CreateIngredientForRecipeSerializer(ModelSerializer):
 
 
 class CreateRecipeSerializer(ModelSerializer):
-
+    image = Base64ImageField()
     tags = PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
@@ -149,6 +152,7 @@ class CreateRecipeSerializer(ModelSerializer):
         model = Recipe
         fields = (
             'id',
+            'image',
             'tags',
             'ingredients',
             'name',
@@ -166,11 +170,13 @@ class CreateRecipeSerializer(ModelSerializer):
 
 
 class RecSerializer(ModelSerializer):
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
         fields = (
             'id',
+            'image',
             'name',
             'cooking_time',
         )

@@ -6,7 +6,13 @@ from .serializers import (
     CreateRecipeSerializer,
     FavoriteSerializer,
 )
-from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart
+from recipes.models import (
+    Tag,
+    Ingredient,
+    Recipe,
+    Favorite,
+    ShoppingCart,
+)
 from api.permissions import IsAdminOrReader, IsAdminOrAuthor
 from .fiters import IngredientFilters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -71,7 +77,7 @@ class RecipeViewSet(ModelViewSet):
 
     @action(
         permission_classes=(IsAuthenticated,),
-        methods=['POST', 'DELETE'],
+        methods=['GET', 'POST', 'DELETE'],
         url_path='shopping_cart',
         detail=True,
     )

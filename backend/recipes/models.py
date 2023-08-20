@@ -75,6 +75,10 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
     )
+    image = models.ImageField(
+        upload_to='recipes/media',
+        blank=False
+    )
 
 
 class IngredientInRecipe(models.Model):
