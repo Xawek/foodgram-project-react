@@ -4,7 +4,13 @@ from rest_framework.serializers import (
     IntegerField,
     PrimaryKeyRelatedField
 )
-from recipes.models import Tag, Ingredient, Recipe, IngredientInRecipe
+from recipes.models import (
+    Tag,
+    Ingredient,
+    Recipe,
+    IngredientInRecipe,
+    Favorite,
+)
 from api.users.serializers import FoodgramUserSerializer
 
 
@@ -152,6 +158,35 @@ class CreateRecipeSerializer(ModelSerializer):
 
     def to_representation(self, recipe):
         return RecipeSerializer(
+            recipe,
+            context={
+                'request': self.context.get('request'),
+            }
+        ).data
+
+
+class RecSerializer(ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'cooking_time',
+        )
+
+
+class FavoriteSerializer(ModelSerializer):
+
+    class Meta:
+        model = Favorite
+        fields = (
+            'user',
+            'recipe',
+        )
+
+    def to_representation(self, recipe):
+        return RecSerializer(
             recipe,
             context={
                 'request': self.context.get('request'),

@@ -4,12 +4,18 @@ from .serializers import (
     IngredientSerializer,
     RecipeSerializer,
     CreateRecipeSerializer,
+    FavoriteSerializer,
 )
-from recipes.models import Tag, Ingredient, Recipe
+from recipes.models import Tag, Ingredient, Recipe, Favorite
 from api.permissions import IsAdminOrReader, IsAdminOrAuthor
 from .fiters import IngredientFilters
 from django_filters.rest_framework import DjangoFilterBackend
 from api.pagination import FoodgramPagination
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 
 
 class TagViewSet(ModelViewSet):
@@ -39,3 +45,26 @@ class RecipeViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(
+        permission_classes=(IsAuthenticated,),
+        methods=['POST', 'DELETE'],
+        url_path='favorite',
+        detail=True,
+    )
+    def favorite(self, request, pk):
+        if request.method == 'POST':
+            recipe = get_object_or_404(Recipe, id=pk)
+            Favorite.objects.create(user=request.user, recipe=recipe,)
+            serializer = FavoriteSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'DELETE':
+            recipe = get_object_or_404(Recipe, id=pk)
+            favorite_for_removre = Favorite.objects.filter(
+                user=request.user,
+                recipe=recipe
+                )
+            if favorite_for_removre.exists():
+                favorite_for_removre.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -26,12 +26,6 @@ class FoodgramUsersViewSet(UserViewSet):
         author = get_object_or_404(User, id=id)
         user = request.user
         if request.method == 'POST':
-            if Follow.objects.filter(user=user, author=author).exists():
-                serializer = FollowUserSerializer(
-                    author,
-                    context={'request': request},
-                )
-                Response(serializer.data)
             if author == user:
                 return Response(
                     status=status.HTTP_400_BAD_REQUEST
