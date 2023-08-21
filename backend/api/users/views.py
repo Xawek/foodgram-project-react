@@ -28,6 +28,7 @@ class FoodgramUsersViewSet(UserViewSet):
         if request.method == 'POST':
             if author == user:
                 return Response(
+                    {'errors': 'Нельзя подписаться на себя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             serializer = FollowUserSerializer(

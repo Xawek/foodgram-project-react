@@ -4,6 +4,8 @@ from django.core.validators import (
     MinValueValidator,
     MaxValueValidator
 )
+# from django.contrib.auth import get_user_model
+# User = get_user_model()
 from users.models import User
 
 
@@ -32,6 +34,8 @@ class Tag(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
 
 
 class Ingredient(models.Model):
@@ -47,6 +51,8 @@ class Ingredient(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
 
 class Recipe(models.Model):
@@ -79,6 +85,11 @@ class Recipe(models.Model):
         upload_to='recipes/media',
         blank=False
     )
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
 
 class IngredientInRecipe(models.Model):
@@ -121,6 +132,8 @@ class Favorite(models.Model):
 
     class Meta:
         ordering = ['id']
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
         constraints = [
             models.UniqueConstraint(
                 fields=(
@@ -144,6 +157,8 @@ class ShoppingCart(models.Model):
 
     class Meta:
         ordering = ['id']
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
         constraints = [
             models.UniqueConstraint(
                 fields=(

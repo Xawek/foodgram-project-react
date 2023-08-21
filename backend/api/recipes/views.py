@@ -63,7 +63,10 @@ class RecipeViewSet(ModelViewSet):
             recipe = get_object_or_404(Recipe, id=pk)
             Favorite.objects.create(user=request.user, recipe=recipe,)
             serializer = FavoriteSerializer(recipe)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
         if request.method == 'DELETE':
             recipe = get_object_or_404(Recipe, id=pk)
             favorite_for_removre = Favorite.objects.filter(
@@ -72,8 +75,14 @@ class RecipeViewSet(ModelViewSet):
                 )
             if favorite_for_removre.exists():
                 favorite_for_removre.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'detail': 'Рецепт успешно удален'},
+                    status=status.HTTP_204_NO_CONTENT
+                )
+        return Response(
+            {'errors': 'Ошибка запроса'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(
         permission_classes=(IsAuthenticated,),
@@ -86,7 +95,10 @@ class RecipeViewSet(ModelViewSet):
             recipe = get_object_or_404(Recipe, id=pk)
             ShoppingCart.objects.create(user=request.user, recipe=recipe,)
             serializer = FavoriteSerializer(recipe)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+                )
         if request.method == 'DELETE':
             recipe = get_object_or_404(Recipe, id=pk)
             favorite_for_removre = ShoppingCart.objects.filter(
@@ -95,5 +107,11 @@ class RecipeViewSet(ModelViewSet):
                 )
             if favorite_for_removre.exists():
                 favorite_for_removre.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'detail': 'Рецепт успешно удален'},
+                    status=status.HTTP_204_NO_CONTENT
+                )
+        return Response(
+            {'errors': 'Ошибка запроса'},
+            status=status.HTTP_400_BAD_REQUEST
+        )

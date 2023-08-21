@@ -12,7 +12,6 @@ class UserAdmin(admin.UserAdmin):
         'username',
         'first_name',
         'last_name',
-        'password',
     )
     list_filter = (
         'email',
@@ -23,9 +22,6 @@ class UserAdmin(admin.UserAdmin):
         'email',
         'id',
         'username',
-    )
-    list_editable = (
-        'password',
     )
 
 
