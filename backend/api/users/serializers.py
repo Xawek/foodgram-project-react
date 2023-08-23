@@ -25,29 +25,3 @@ class FoodgramUserSerializer(UserSerializer):
             user=user,
             author=data.id
         ).exists()
-
-
-class FollowUserSerializer(UserSerializer):
-    email = serializers.ReadOnlyField()
-    username = serializers.ReadOnlyField()
-    first_name = serializers.ReadOnlyField()
-    last_name = serializers.ReadOnlyField()
-    is_subscribed = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Follow
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-        )
-
-    def get_is_subscribed(self, data):
-        user = self.context.get('request').user
-        return Follow.objects.filter(
-            user=user,
-            author=data.id
-        ).exists()

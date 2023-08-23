@@ -12,6 +12,7 @@ from recipes.models import (
     Recipe,
     Favorite,
     ShoppingCart,
+    IngredientInRecipe
 )
 from api.permissions import IsAdminOrReader, IsAdminOrAuthor
 from .fiters import IngredientFilters
@@ -22,12 +23,15 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from django.http import HttpResponse
+from django.db.models.aggregates import Sum
 
 
 class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
     permission_classes = (IsAdminOrReader, )
+    pagination_class = None
 
 
 class IngredientViewSet(ModelViewSet):
@@ -35,6 +39,7 @@ class IngredientViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     permission_classes = (IsAdminOrReader, )
     filter_backends = (IngredientFilters, )
+    pagination_class = None
 
 
 class RecipeViewSet(ModelViewSet):
@@ -115,3 +120,30 @@ class RecipeViewSet(ModelViewSet):
             {'errors': 'Ошибка запроса'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    @action(
+        permission_classes=(IsAuthenticated,),
+        methods=['GET'],
+        url_path='download_shopping_cart',
+        detail=False,
+    )
+    def download_shopping_cart(self, request):
+        user = request.user
+        ingredients = IngredientInRecipe.objects.filter(
+            recipe__shopping__user=user).values(
+            'ingredient__name',
+            'ingredient__measurement_unit').annotate(
+            amount=Sum('amount')
+        )
+        data = []
+        for ingredient in ingredients:
+            data.append(
+                f'{ingredient["ingredient__name"]} - '
+                f'{ingredient["amount"]} '
+                f'{ingredient["ingredient__measurement_unit"]}'
+            )
+        content = 'Список покупок:\n\n' + '\n'.join(data)
+        filename = 'shop.txt'
+        request = HttpResponse(content, content_type='text/plain')
+        request['Content-Disposition'] = f'attachment; filename={filename}'
+        return request

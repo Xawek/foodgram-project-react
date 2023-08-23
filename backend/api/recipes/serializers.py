@@ -2,7 +2,8 @@ from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
     IntegerField,
-    PrimaryKeyRelatedField
+    PrimaryKeyRelatedField,
+    ReadOnlyField
 )
 from recipes.models import (
     Tag,
@@ -11,8 +12,52 @@ from recipes.models import (
     IngredientInRecipe,
     Favorite,
 )
+from users.models import User, Follow
 from api.users.serializers import FoodgramUserSerializer
 from drf_extra_fields.fields import Base64ImageField
+
+
+class FollowUserSerializer(FoodgramUserSerializer):
+    recipes = SerializerMethodField(method_name='get_recipes')
+    recipes_count = SerializerMethodField(method_name='get_recipes_count')
+    is_subscribed = SerializerMethodField(method_name='get_is_subscribed')
+    email = ReadOnlyField()
+    first_name = ReadOnlyField()
+    last_name = ReadOnlyField()
+    username = ReadOnlyField()
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count',
+        )
+
+    def get_recipes(self, data):
+        limit = self.context['request'].query_params.get('recipes_limit')
+        recipes = data.recipes.all()[:(int(limit))]
+        return SmallRecipeSerializer(
+            recipes,
+            many=True,
+        ).data
+
+    def get_recipes_count(self, data):
+        return data.recipes.count()
+
+    def get_is_subscribed(self, data):
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return Follow.objects.filter(
+            user=user,
+            author=data.id
+        ).exists()
 
 
 class TagSerializer(ModelSerializer):
@@ -69,7 +114,7 @@ class IngredientForRecipeSerializer(ModelSerializer):
 
 
 class RecipeSerializer(ModelSerializer):
-    image = Base64ImageField()
+    image = ReadOnlyField(source='image.url')
     tags = TagSerializer(
         many=True
         )
@@ -169,7 +214,7 @@ class CreateRecipeSerializer(ModelSerializer):
         ).data
 
 
-class RecSerializer(ModelSerializer):
+class SmallRecipeSerializer(ModelSerializer):
     image = Base64ImageField()
 
     class Meta:
@@ -192,7 +237,7 @@ class FavoriteSerializer(ModelSerializer):
         )
 
     def to_representation(self, recipe):
-        return RecSerializer(
+        return SmallRecipeSerializer(
             recipe,
             context={
                 'request': self.context.get('request'),

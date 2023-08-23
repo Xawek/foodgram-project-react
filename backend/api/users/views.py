@@ -1,7 +1,8 @@
 from djoser.views import UserViewSet
 from users.models import User, Follow
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import FoodgramUserSerializer, FollowUserSerializer
+from .serializers import FoodgramUserSerializer
+from api.recipes.serializers import FollowUserSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status

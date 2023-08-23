@@ -80,6 +80,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name='recipes'
     )
     image = models.ImageField(
         upload_to='recipes/media',
@@ -96,10 +97,12 @@ class IngredientInRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
+        related_name='ingredient_recipe'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+        related_name='recipe_ingredient'
     )
     amount = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1)],
@@ -153,6 +156,7 @@ class ShoppingCart(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+        related_name='shopping'
     )
 
     class Meta:
