@@ -32,14 +32,12 @@ class FoodgramUsersViewSet(UserViewSet):
                     {'errors': 'Нельзя подписаться на себя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            serializer = FollowUserSerializer(
-                author,
-                data=request.data,
-                context={'request': request},
-            )
-            serializer.is_valid(raise_exception=True)
             set_follow = Follow(user=user, author=author)
             set_follow.save()
+            serializer = FollowUserSerializer(
+                author,
+                context={'request': request},
+            )
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED

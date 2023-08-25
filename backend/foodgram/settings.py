@@ -158,6 +158,10 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
+    'SERIALIZERS': {
+        'user': 'api.users.serializers.FoodgramUserSerializer',
+        'user_create': 'api.users.serializers.FoodgramUserCreateSerializer',
+    },
     'PERMISSIONS': {
         'user': ['rest_framework.permissions.IsAuthenticated'],
         'user_list': ['rest_framework.permissions.AllowAny'],

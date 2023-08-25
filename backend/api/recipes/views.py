@@ -15,7 +15,7 @@ from recipes.models import (
     IngredientInRecipe
 )
 from api.permissions import IsAdminOrReader, IsAdminOrAuthor
-from .fiters import IngredientFilters
+from .fiters import IngredientFilters, RecipeFilters
 from django_filters.rest_framework import DjangoFilterBackend
 from api.pagination import FoodgramPagination
 from django.shortcuts import get_object_or_404
@@ -48,6 +48,7 @@ class RecipeViewSet(ModelViewSet):
     permission_classes = (IsAdminOrAuthor, )
     pagination_class = FoodgramPagination
     filter_backends = (DjangoFilterBackend, )
+    filterset_class = RecipeFilters
 
     def get_serializer_class(self):
         if self.request.method == 'POST' or self.request.method == 'PATCH':
@@ -58,20 +59,24 @@ class RecipeViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
 
     @action(
-        permission_classes=(IsAuthenticated,),
+        permission_classes=(IsAuthenticated, ),
         methods=['POST', 'DELETE'],
-        url_path='favorite',
         detail=True,
     )
     def favorite(self, request, pk):
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
-            Favorite.objects.create(user=request.user, recipe=recipe,)
             serializer = FavoriteSerializer(recipe)
+            if not Favorite.objects.filter(
+                    user=request.user, recipe=recipe,).exists():
+                Favorite.objects.create(user=request.user, recipe=recipe,)
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED
+                )
             return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         if request.method == 'DELETE':
             recipe = get_object_or_404(Recipe, id=pk)
             favorite_for_removre = Favorite.objects.filter(
@@ -90,19 +95,23 @@ class RecipeViewSet(ModelViewSet):
         )
 
     @action(
-        permission_classes=(IsAuthenticated,),
-        methods=['GET', 'POST', 'DELETE'],
-        url_path='shopping_cart',
+        permission_classes=(IsAuthenticated, ),
+        methods=['POST', 'DELETE'],
         detail=True,
     )
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
-            ShoppingCart.objects.create(user=request.user, recipe=recipe,)
             serializer = FavoriteSerializer(recipe)
+            if not ShoppingCart.objects.filter(
+                    user=request.user, recipe=recipe,).exists():
+                ShoppingCart.objects.create(user=request.user, recipe=recipe,)
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED
+                    )
             return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
+                    status=status.HTTP_400_BAD_REQUEST
                 )
         if request.method == 'DELETE':
             recipe = get_object_or_404(Recipe, id=pk)

@@ -3,7 +3,7 @@ from rest_framework.serializers import (
     SerializerMethodField,
     IntegerField,
     PrimaryKeyRelatedField,
-    ReadOnlyField
+    ReadOnlyField,
 )
 from recipes.models import (
     Tag,
@@ -11,8 +11,9 @@ from recipes.models import (
     Recipe,
     IngredientInRecipe,
     Favorite,
+    ShoppingCart
 )
-from users.models import User, Follow
+from users.models import User
 from api.users.serializers import FoodgramUserSerializer
 from drf_extra_fields.fields import Base64ImageField
 
@@ -20,11 +21,6 @@ from drf_extra_fields.fields import Base64ImageField
 class FollowUserSerializer(FoodgramUserSerializer):
     recipes = SerializerMethodField(method_name='get_recipes')
     recipes_count = SerializerMethodField(method_name='get_recipes_count')
-    is_subscribed = SerializerMethodField(method_name='get_is_subscribed')
-    email = ReadOnlyField()
-    first_name = ReadOnlyField()
-    last_name = ReadOnlyField()
-    username = ReadOnlyField()
 
     class Meta:
         model = User
@@ -40,8 +36,12 @@ class FollowUserSerializer(FoodgramUserSerializer):
         )
 
     def get_recipes(self, data):
-        limit = self.context['request'].query_params.get('recipes_limit')
-        recipes = data.recipes.all()[:(int(limit))]
+        limit = int(self.context['request'].query_params.get(
+            'recipes_limit', default=0)
+        )
+        recipes = data.recipes.all()
+        if limit > 0:
+            recipes = recipes[:limit]
         return SmallRecipeSerializer(
             recipes,
             many=True,
@@ -49,15 +49,6 @@ class FollowUserSerializer(FoodgramUserSerializer):
 
     def get_recipes_count(self, data):
         return data.recipes.count()
-
-    def get_is_subscribed(self, data):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Follow.objects.filter(
-            user=user,
-            author=data.id
-        ).exists()
 
 
 class TagSerializer(ModelSerializer):
@@ -129,6 +120,14 @@ class RecipeSerializer(ModelSerializer):
         )
         return ingredients.data
 
+    is_favorited = SerializerMethodField(
+        method_name='get_is_favorited',
+    )
+    is_in_shopping_cart = SerializerMethodField(
+        method_name='get_is_in_shopping_cart',
+        read_only=True
+    )
+
     class Meta:
         model = Recipe
         fields = (
@@ -140,7 +139,23 @@ class RecipeSerializer(ModelSerializer):
             'name',
             'text',
             'cooking_time',
+            'is_favorited',
+            'is_in_shopping_cart',
         )
+
+    def get_is_favorited(self, recipe):
+        request = self.context.get('request')
+        user = request.user
+        if user.is_anonymous:
+            return False
+        return Favorite.objects.filter(user=user, recipe=recipe).exists()
+
+    def get_is_in_shopping_cart(self, recipe):
+        request = self.context.get('request')
+        user = request.user
+        if user.is_anonymous:
+            return False
+        return ShoppingCart.objects.filter(user=user, recipe=recipe).exists()
 
 
 class CreateIngredientForRecipeSerializer(ModelSerializer):
