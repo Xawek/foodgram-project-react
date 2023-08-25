@@ -26,3 +26,22 @@
 
 ### Автор
 + [Bogdanov Anton](https://github.com/Xawek/)
+
+### Содержание файла .env размешаемого в корне проекта
+
+###### для PostgreSQL:
+
+POSTGRES_USER=имя пользователя,
+POSTGRES_PASSWORD=пароль пользователя,
+POSTGRES_DB=имя базы данных.
+
+###### для Django-проекта:
+
+DB_HOST=адрес, по которому Django будет соединяться с базой данных
+DB_PORT=порт, по которому Django будет обращаться к базе данных
+SECRET_KEY=ключ для генерации криптографически подписанных токенов
+DEBUG=True\False
+SERVER_IP=IP сервера
+LOCAL_IP=IP локальный
+LOCALHOST=локальный хост
+DOMAIN_NAME=доменное имя
