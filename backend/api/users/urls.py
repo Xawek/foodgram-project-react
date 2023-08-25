@@ -3,7 +3,6 @@ from rest_framework.routers import DefaultRouter
 
 from .views import FoodgramUsersViewSet
 
-
 router = DefaultRouter()
 router.register(r'users', FoodgramUsersViewSet, basename='users')
 

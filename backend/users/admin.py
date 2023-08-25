@@ -1,7 +1,7 @@
-from django.contrib.auth import admin
 from django.contrib import admin as reg_admin
+from django.contrib.auth import admin
 
-from .models import User, Follow
+from .models import Follow, User
 
 
 @reg_admin.register(User)

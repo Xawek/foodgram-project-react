@@ -1,15 +1,15 @@
 from django.contrib import admin
 
-from .models import Tag, Ingredient, Recipe
+from .models import Ingredient, Recipe, Tag
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-            'id',
-            'name',
-            'color',
-            'slug',
+        'id',
+        'name',
+        'color',
+        'slug',
     )
     prepopulated_fields = {'slug': ('name',)}
 
@@ -17,9 +17,9 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = (
-            'id',
-            'name',
-            'measurement_unit',
+        'id',
+        'name',
+        'measurement_unit',
     )
 
 
@@ -36,13 +36,13 @@ class TagInLine(admin.TabularInline):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-            'id',
-            'author',
-            'name',
-            'text',
+        'id',
+        'author',
+        'name',
+        'text',
     )
     search_fields = (
-            'author',
-            'name',
+        'author',
+        'name',
     )
     inlines = [IngredientsInLine, TagInLine]

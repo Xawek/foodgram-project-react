@@ -1,6 +1,7 @@
-from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import FilterSet, filters
-from recipes.models import Tag, Recipe
+from rest_framework.filters import SearchFilter
+
+from recipes.models import Recipe, Tag
 from users.models import User
 
 
@@ -10,9 +11,10 @@ class IngredientFilters(SearchFilter):
     def filter_queryset(self, request, queryset, view):
         search_value = request.query_params.get(self.search_param, '')
         if search_value:
-            queryset = queryset.filter(
-                name__icontains=search_value)
-        return queryset
+            startswith = queryset.filter(name__startswith=search_value)
+            icontains = queryset.filter(name__icontains=search_value).exclude(
+                name__startswith=search_value)
+        return list(startswith) + list(icontains)
 
 
 class RecipeFilters(FilterSet):

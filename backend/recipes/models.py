@@ -1,11 +1,7 @@
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
-from django.core.validators import (
-    RegexValidator,
-    MinValueValidator,
-    MaxValueValidator
-)
-# from django.contrib.auth import get_user_model
-# User = get_user_model()
+
 from users.models import User
 
 

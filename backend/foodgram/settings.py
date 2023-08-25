@@ -14,20 +14,17 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from dotenv import load_dotenv
+
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=ue9^&pazix$fo=^hg=&e+9yq_c)c-()d5+%m9dh0%#r0!uu1b'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ 
+SECRET_KEY = os.getenv('SECRET_KEY', 'default_value') 
+ 
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ 
+ALLOWED_HOSTS = [os.getenv('SERVER_IP'), os.getenv('LOCAL_IP'), os.getenv('LOCALHOST'), os.getenv('DOMAIN_NAME')]
 
 # Custom user model
 
@@ -79,16 +76,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
-
-
-# Database sqlite
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 # Database postgresql
 

@@ -1,13 +1,15 @@
-from djoser.views import UserViewSet
-from users.models import User, Follow
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import FoodgramUserSerializer
-from api.recipes.serializers import FollowUserSerializer
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
 from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+
 from api.pagination import FoodgramPagination
+from api.recipes.serializers import FollowUserSerializer
+from users.models import Follow, User
+
+from .serializers import FoodgramUserSerializer
 
 
 class FoodgramUsersViewSet(UserViewSet):
@@ -35,13 +37,9 @@ class FoodgramUsersViewSet(UserViewSet):
             set_follow = Follow(user=user, author=author)
             set_follow.save()
             serializer = FollowUserSerializer(
-                author,
-                context={'request': request},
-            )
+                author, context={'request': request},)
             return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
+                serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             author = get_object_or_404(User, id=id)
             user = request.user
@@ -54,6 +52,7 @@ class FoodgramUsersViewSet(UserViewSet):
             return Response(
                 status=status.HTTP_204_NO_CONTENT
             )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         permission_classes=(IsAuthenticated,),

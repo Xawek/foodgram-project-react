@@ -1,30 +1,22 @@
-from rest_framework.viewsets import ModelViewSet
-from .serializers import (
-    TagSerializer,
-    IngredientSerializer,
-    RecipeSerializer,
-    CreateRecipeSerializer,
-    FavoriteSerializer,
-)
-from recipes.models import (
-    Tag,
-    Ingredient,
-    Recipe,
-    Favorite,
-    ShoppingCart,
-    IngredientInRecipe
-)
-from api.permissions import IsAdminOrReader, IsAdminOrAuthor
-from .fiters import IngredientFilters, RecipeFilters
-from django_filters.rest_framework import DjangoFilterBackend
-from api.pagination import FoodgramPagination
+from django.db.models.aggregates import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
-from django.http import HttpResponse
-from django.db.models.aggregates import Sum
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+
+from api.pagination import FoodgramPagination
+from api.permissions import IsAdminOrAuthor, IsAdminOrReader
+from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                            ShoppingCart, Tag)
+
+from .fiters import IngredientFilters, RecipeFilters
+from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
+                          IngredientSerializer, RecipeSerializer,
+                          TagSerializer)
 
 
 class TagViewSet(ModelViewSet):
@@ -75,14 +67,14 @@ class RecipeViewSet(ModelViewSet):
                     status=status.HTTP_201_CREATED
                 )
             return Response(
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if request.method == 'DELETE':
             recipe = get_object_or_404(Recipe, id=pk)
             favorite_for_removre = Favorite.objects.filter(
                 user=request.user,
                 recipe=recipe
-                )
+            )
             if favorite_for_removre.exists():
                 favorite_for_removre.delete()
                 return Response(
@@ -109,16 +101,16 @@ class RecipeViewSet(ModelViewSet):
                 return Response(
                     serializer.data,
                     status=status.HTTP_201_CREATED
-                    )
-            return Response(
-                    status=status.HTTP_400_BAD_REQUEST
                 )
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if request.method == 'DELETE':
             recipe = get_object_or_404(Recipe, id=pk)
             favorite_for_removre = ShoppingCart.objects.filter(
                 user=request.user,
                 recipe=recipe
-                )
+            )
             if favorite_for_removre.exists():
                 favorite_for_removre.delete()
                 return Response(
@@ -133,7 +125,6 @@ class RecipeViewSet(ModelViewSet):
     @action(
         permission_classes=(IsAuthenticated,),
         methods=['GET'],
-        url_path='download_shopping_cart',
         detail=False,
     )
     def download_shopping_cart(self, request):
@@ -141,7 +132,8 @@ class RecipeViewSet(ModelViewSet):
         ingredients = IngredientInRecipe.objects.filter(
             recipe__shopping__user=user).values(
             'ingredient__name',
-            'ingredient__measurement_unit').annotate(
+            'ingredient__measurement_unit').order_by(
+            'ingredient__name').annotate(
             amount=Sum('amount')
         )
         data = []

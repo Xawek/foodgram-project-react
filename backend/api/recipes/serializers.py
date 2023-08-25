@@ -1,21 +1,12 @@
-from rest_framework.serializers import (
-    ModelSerializer,
-    SerializerMethodField,
-    IntegerField,
-    PrimaryKeyRelatedField,
-    ReadOnlyField,
-)
-from recipes.models import (
-    Tag,
-    Ingredient,
-    Recipe,
-    IngredientInRecipe,
-    Favorite,
-    ShoppingCart
-)
-from users.models import User
-from api.users.serializers import FoodgramUserSerializer
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework.serializers import (IntegerField, ModelSerializer,
+                                        PrimaryKeyRelatedField, ReadOnlyField,
+                                        SerializerMethodField, ValidationError)
+
+from api.users.serializers import FoodgramUserSerializer
+from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                            ShoppingCart, Tag)
+from users.models import User
 
 
 class FollowUserSerializer(FoodgramUserSerializer):
@@ -77,13 +68,13 @@ class IngredientSerializer(ModelSerializer):
 class IngredientForRecipeSerializer(ModelSerializer):
     id = SerializerMethodField(
         method_name='get_ingredient_id',
-        )
+    )
     name = SerializerMethodField(
         method_name='get_ingredient_name'
-        )
+    )
     measurement_unit = SerializerMethodField(
         method_name='get_ingredient_measure'
-        )
+    )
 
     def get_ingredient_id(self, data):
         return data.ingredient.id
@@ -108,11 +99,11 @@ class RecipeSerializer(ModelSerializer):
     image = ReadOnlyField(source='image.url')
     tags = TagSerializer(
         many=True
-        )
+    )
     author = FoodgramUserSerializer()
     ingredients = SerializerMethodField(
         method_name='get_ingredients'
-        )
+    )
 
     def get_ingredients(self, data):
         ingredients = IngredientForRecipeSerializer(
@@ -177,6 +168,25 @@ class CreateRecipeSerializer(ModelSerializer):
         many=True
     )
     ingredients = CreateIngredientForRecipeSerializer(many=True)
+
+    def validate_tags(self, tags):
+        if not tags:
+            raise ValidationError(
+                'Добавьте тег'
+            )
+        return tags
+
+    def validate_ingredients(self, ingredients):
+        if not ingredients:
+            raise ValidationError(
+                'Добавьте ингредиент'
+            )
+        ingredients_list = []
+        for ingredient_id in ingredients:
+            ingredients_list.append(ingredient_id['id'])
+        if len(ingredients_list) != len(set(ingredients_list)):
+            raise ValidationError('Одинаковые ингредиенты')
+        return ingredients
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
