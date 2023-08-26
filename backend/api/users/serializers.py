@@ -2,7 +2,6 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MinLengthValidator
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-
 from users.models import Follow, User
 from users.validators import validate_username
 
