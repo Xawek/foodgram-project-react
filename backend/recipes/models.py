@@ -81,9 +81,12 @@ class Recipe(models.Model):
         upload_to='recipes/media',
         blank=False
     )
+    pub_date = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
-        ordering = ['name']
+        ordering = ['-pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -92,7 +95,7 @@ class IngredientInRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredient_recipe'
+        related_name='ingredient_recipe',
     )
     recipe = models.ForeignKey(
         Recipe,

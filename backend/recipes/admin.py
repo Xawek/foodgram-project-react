@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Ingredient, Recipe, Tag
+from .models import Ingredient, Recipe, Tag, Favorite, ShoppingCart
 
 
 @admin.register(Tag)
@@ -25,12 +25,12 @@ class IngredientAdmin(admin.ModelAdmin):
 
 class IngredientsInLine(admin.TabularInline):
     model = Recipe.ingredients.through
-    extra = 1
+    min_num = 1
 
 
 class TagInLine(admin.TabularInline):
     model = Recipe.tags.through
-    extra = 1
+    min_num = 1
 
 
 @admin.register(Recipe)
@@ -40,9 +40,44 @@ class RecipeAdmin(admin.ModelAdmin):
         'author',
         'name',
         'text',
+        'pub_date',
     )
     search_fields = (
         'author',
         'name',
     )
     inlines = [IngredientsInLine, TagInLine]
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'recipe_name',
+    )
+    search_fields = (
+        'user',
+        'recipe__name',
+    )
+
+    def recipe_name(self, obj):
+        return obj.recipe.name
+
+    recipe_name.short_description = 'Название рецепта'
+
+
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'recipe_name',
+    )
+    search_fields = (
+        'user',
+        'recipe__name',
+    )
+
+    def recipe_name(self, obj):
+        return obj.recipe.name
+
+    recipe_name.short_description = 'Название рецепта'
