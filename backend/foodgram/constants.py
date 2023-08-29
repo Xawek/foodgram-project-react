@@ -1,8 +1,8 @@
 # Используются в recipes.models
 LENGTH_VALUE_FOR_RECIPE = 200
 LENGTH_VALUE_FOR_COLOR = 7
-MIN_VALUE = 1
-MAX_VALUE = 360
+MIN_VALUE_FOR_RECIPE = 1
+MAX_VALUE_FOR_RECIPE = 360
 
 # Используются в users.models
 LENGTH_VALUE_FOR_USER = 150
