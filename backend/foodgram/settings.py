@@ -23,7 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'default_value') 
  
 DEBUG = bool(os.getenv('DEBUG', 'False'))
- 
+
+# ALLOWED_HOSTS = [os.getenv('SERVER_IP'), os.getenv('LOCAL_IP'), os.getenv('LOCALHOST'), os.getenv('DOMAIN_NAME')] 
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'default_value').split(',')
 
 # Custom user model
