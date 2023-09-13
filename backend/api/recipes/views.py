@@ -11,11 +11,21 @@ from rest_framework.viewsets import ModelViewSet
 from api.pagination import FoodgramPagination
 from api.permissions import IsAdminOrAuthor, IsAdminOrReader
 from api.recipes.fiters import IngredientFilters, RecipeFilters
-from api.recipes.serializers import (CreateRecipeSerializer,
-                                     FavoriteSerializer, IngredientSerializer,
-                                     RecipeSerializer, TagSerializer)
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingCart, Tag)
+from api.recipes.serializers import (
+    CreateRecipeSerializer,
+    FavoriteSerializer,
+    IngredientSerializer,
+    RecipeSerializer,
+    TagSerializer,
+)
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    IngredientInRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
 
 
 class TagViewSet(ModelViewSet):

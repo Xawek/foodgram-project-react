@@ -3,8 +3,11 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MinLengthValidator
 from django.db import models
 
-from foodgram.constants import (LENGTH_VALUE_FOR_EMAIL, LENGTH_VALUE_FOR_USER,
-                                MIN_VALUE)
+from foodgram.constants import (
+    LENGTH_VALUE_FOR_EMAIL,
+    LENGTH_VALUE_FOR_USER,
+    MIN_VALUE,
+)
 from users.validators import validate_username
 
 

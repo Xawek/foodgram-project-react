@@ -1,11 +1,22 @@
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.serializers import (IntegerField, ModelSerializer,
-                                        PrimaryKeyRelatedField, ReadOnlyField,
-                                        SerializerMethodField, ValidationError)
+from rest_framework.serializers import (
+    IntegerField,
+    ModelSerializer,
+    PrimaryKeyRelatedField,
+    ReadOnlyField,
+    SerializerMethodField,
+    ValidationError,
+)
 
 from api.users.serializers import FoodgramUserSerializer
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingCart, Tag)
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    IngredientInRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
 from users.models import User
 
 

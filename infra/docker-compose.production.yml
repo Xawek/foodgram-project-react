@@ -14,7 +14,6 @@ services:
 
   backend:
     image: xawek/foodgram_backend
-    env_file: ../.env
     volumes:
       - static:/backend_static
       - media:/media
@@ -29,7 +28,6 @@ services:
 
   nginx:
     image: nginx:1.19.3
-    env_file: ../.env
     ports:
       - 9090:80
     volumes:

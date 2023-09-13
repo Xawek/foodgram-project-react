@@ -1,10 +1,16 @@
-from django.core.validators import (MaxValueValidator, MinValueValidator,
-                                    RegexValidator)
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    RegexValidator,
+)
 from django.db import models
 
-from foodgram.constants import (LENGTH_VALUE_FOR_COLOR,
-                                LENGTH_VALUE_FOR_RECIPE, MAX_VALUE_FOR_RECIPE,
-                                MIN_VALUE_FOR_RECIPE)
+from foodgram.constants import (
+    LENGTH_VALUE_FOR_COLOR,
+    LENGTH_VALUE_FOR_RECIPE,
+    MAX_VALUE_FOR_RECIPE,
+    MIN_VALUE_FOR_RECIPE,
+)
 from users.models import User
 
 
